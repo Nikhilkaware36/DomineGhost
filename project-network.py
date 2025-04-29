@@ -4,6 +4,7 @@ import sys
 import time
 import random
 import requests
+import os
 from socket import gethostbyname, gethostbyaddr
 from datetime import datetime
 from colorama import Fore, Style, init
@@ -63,28 +64,20 @@ def get_domain_age(domain):
     try:
         whois_data = subprocess.check_output(['whois', domain])
         for line in whois_data.decode().splitlines():
-            if "Creation Date" in line or "created" in line:  # Checking for multiple variations of the field
-                # Try to extract the date in different formats
+            if "Creation Date" in line or "created" in line:
                 date_str = line.split(":")[1].strip()
-                try:
-                    # Try matching common date formats
-                    creation_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
-                except ValueError:
+                for fmt in ("%Y-%m-%dT%H:%M:%S", "%Y-%m-%d", "%d-%b-%Y"):
                     try:
-                        creation_date = datetime.strptime(date_str, "%Y-%m-%d")  # e.g., "1997-09-15"
+                        creation_date = datetime.strptime(date_str, fmt)
+                        age = (datetime.now() - creation_date).days
+                        return age
                     except ValueError:
-                        try:
-                            creation_date = datetime.strptime(date_str, "%d-%b-%Y")  # e.g., "15-Sep-1997"
-                        except ValueError:
-                            print(f"Could not parse date: {date_str}")
-                            return None
-                age = (datetime.now() - creation_date).days
-                return age
+                        continue
     except Exception as e:
         print(f"Error getting domain age: {e}")
     return None
 
-# Basic beginner scan (WHOIS, DNS, Ping, NMAP)
+# Beginner scan
 def beginner_scan(domain):
     print(f"\n{Fore.GREEN}[+] Running WHOIS Scan (Offline)...")
     try:
@@ -111,27 +104,22 @@ def beginner_scan(domain):
     print(f"\n{Fore.GREEN}[+] Running NMAP Basic Scan (Offline)...")
     start_time = datetime.now()
     result = subprocess.run(["nmap", "-F", domain], capture_output=True, text=True)
-    
+
     if result.returncode == 0:
-        end_time = datetime.now()
-        elapsed_time = end_time - start_time
+        elapsed_time = datetime.now() - start_time
         print(f"{Fore.GREEN}[✔️] NMAP Scan Results (Success) [{elapsed_time}]:\n{result.stdout}")
     else:
         success_failure_indicator("NMAP Basic Scan", success=False)
 
-    # Simulate insights based on domain
     print(f"\n{Fore.YELLOW}[+] AI Insight: {random.choice(['Domain is new and could be suspicious.', 'No known issues found.', 'Might be related to spam activity.'])}")
 
-# Intermediate scan (Full NMAP Scan, Reverse IP, Ports)
+# Intermediate scan
 def intermediate_scan(domain):
     print(f"\n{Fore.YELLOW}[+] Running NMAP Full Scan (Offline)...")
-    start_time = datetime.now()
     result = subprocess.run(["nmap", "-p-", domain], capture_output=True, text=True)
-    
+
     if result.returncode == 0:
-        end_time = datetime.now()
-        elapsed_time = end_time - start_time
-        print(f"{Fore.YELLOW}[✔️] NMAP Full Scan Results (Success) [{elapsed_time}]:\n{result.stdout}")
+        print(f"{Fore.YELLOW}[✔️] NMAP Full Scan Results:\n{result.stdout}")
     else:
         success_failure_indicator("NMAP Full Scan", success=False)
 
@@ -141,46 +129,71 @@ def intermediate_scan(domain):
         reverse = gethostbyaddr(ip)
         print(f"{Fore.MAGENTA}Reverse IP Info: {reverse}")
         success_failure_indicator("Reverse IP Lookup")
-    except Exception as e:
+    except Exception:
         success_failure_indicator("Reverse IP Lookup", success=False)
 
     print(f"\n{Fore.YELLOW}[+] Running Port Scan (Offline)...")
     subprocess.run(["nmap", "--open", domain])
 
-# Advanced scan (Aggressive NMAP, Phishing Detection, Vulnerability Scan)
+# Hard scan with fallback and report saving
 def hard_scan(domain):
-    print(f"\n{Fore.RED}[+] Running NMAP Aggressive Scan (Offline)...")
-    start_time = datetime.now()
-    result = subprocess.run(["nmap", "-A", domain], capture_output=True, text=True)
-    
-    if result.returncode == 0:
-        end_time = datetime.now()
-        elapsed_time = end_time - start_time
-        print(f"{Fore.RED}[✔️] NMAP Aggressive Scan Results (Success) [{elapsed_time}]:\n{result.stdout}")
-    else:
-        success_failure_indicator("NMAP Aggressive Scan", success=False)
+    report_dir = "reports"
+    os.makedirs(report_dir, exist_ok=True)
+    report_file = os.path.join(report_dir, f"{domain}-report.txt")
 
-    print(f"\n{Fore.RED}[+] Running Phishing Reputation Check (Online)...")
+    def write_report(text):
+        with open(report_file, "a") as f:
+            f.write(text + "\n")
+
+    print(f"\n{Fore.RED}[+] Running NMAP Aggressive Scan...")
+    write_report(f"========== Hard Scan Report for {domain} ==========")
+
     try:
-        response = requests.get(f"https://www.phishtank.com/api/lookup.json?url={domain}")
-        if response.json().get('in_database'):
-            print(f"{Fore.RED}[❌] Warning: Phishing detected!")
+        result = subprocess.run(["nmap", "-A", domain], capture_output=True, text=True)
+        if result.returncode == 0 and "0 hosts up" not in result.stdout:
+            print(result.stdout)
+            write_report("=== NMAP Aggressive Scan ===\n" + result.stdout)
+            success_failure_indicator("NMAP Aggressive Scan")
         else:
-            print(f"{Fore.GREEN}[✔️] No phishing detected.")
-        success_failure_indicator("Phishing Reputation Check")
-    except requests.exceptions.RequestException:
-        success_failure_indicator("Phishing Reputation Check", success=False)
+            raise RuntimeError("Host down or ping blocked.")
+    except:
+        print(f"{Fore.YELLOW}[!] Aggressive scan failed. Retrying with NMAP -Pn...")
+        try:
+            result = subprocess.run(
+                ["nmap", "-Pn", "-sS", "-sV", "-O", "--top-ports", "100", domain],
+                capture_output=True, text=True)
+            print(result.stdout)
+            write_report("=== NMAP Fallback Scan (-Pn) ===\n" + result.stdout)
+            success_failure_indicator("NMAP Fallback Scan")
+        except Exception as e:
+            print(f"{Fore.RED}[❌] NMAP fallback failed: {e}")
+            write_report(f"[!] NMAP Fallback failed: {e}")
+            success_failure_indicator("NMAP Fallback Scan", success=False)
 
-    print(f"\n{Fore.RED}[+] Running Vulnerability Scan (Offline)...")
-    subprocess.run(["nikto", "-h", domain])
+    print(f"\n{Fore.RED}[+] Running Vulnerability Scan with Nikto...")
+    try:
+        nikto_result = subprocess.run(["nikto", "-h", domain], capture_output=True, text=True)
+        print(nikto_result.stdout)
+        write_report("=== Nikto Vulnerability Scan ===\n" + nikto_result.stdout)
+        success_failure_indicator("Nikto Scan")
+    except Exception as e:
+        print(f"{Fore.RED}[❌] Nikto scan failed: {e}")
+        write_report(f"[!] Nikto scan failed: {e}")
+        success_failure_indicator("Nikto Scan", success=False)
 
-    # Simulate vulnerability insights
-    print(f"\n{Fore.RED}[+] AI Insight: {random.choice(['Possible vulnerability detected in port 80.', 'No critical vulnerabilities found.', 'Domain is hosted on a known insecure server.'])}")
+    insight = random.choice([
+        "Possible vulnerability detected in port 80.",
+        "No critical vulnerabilities found.",
+        "Domain is hosted on a known insecure server."
+    ])
+    print(f"\n{Fore.RED}[+] AI Insight: {insight}")
+    write_report(f"\n=== AI Insight ===\n{insight}\n")
+
+    print(f"{Fore.GREEN}\n[✔️] Report saved to: {report_file}\n")
 
 # Main function
 def main():
-    show_banner()  # Display banner with cool animation
-
+    show_banner()
     domain = input(f"{Fore.CYAN}Enter domain (example: example.com): ").strip()
 
     if not validate_domain(domain):
