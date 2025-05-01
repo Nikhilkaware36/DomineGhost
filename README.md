@@ -1,61 +1,65 @@
-DomainGhost 🔍💀
+# DomainGhost 🔍💀
 
-DomainGhost is a powerful, easy-to-use domain and DNS backend scanning tool designed to empower security professionals, ethical hackers, and enthusiasts. 🌐🔐 Whether you're just getting started with security research or you're an experienced expert, DomainGhost gives you the tools you need to assess the health, reputation, and security of any domain. 💻🛡️
-Key Features 🔥
+**DomainGhost** is a powerful and easy-to-use domain and DNS backend scanning tool, designed to empower **security professionals**, **ethical hackers**, and **CTF enthusiasts**. 🌐🔐  
+Whether you're just getting started with security research or you're an experienced expert, DomainGhost gives you the tools to assess the **health**, **reputation**, and **security** of any domain. 💻🛡️
 
-Keywords: CTF, cybersecurity, domain scanner, OSINT, red team, reconnaissance, WHOIS, DNS, NMAP
+---
 
-WHOIS Lookups: Get all the domain registration details. 📇
+## 🔑 Keywords
+`CTF`, `cybersecurity`, `domain scanner`, `OSINT`, `red team`, `reconnaissance`, `WHOIS`, `DNS`, `NMAP`
 
- DNS Resolution: Retrieve detailed DNS records to understand how a domain is set up. 🌐
- 
- Ping Test: Check if the domain is live and reachable. 📶
+---
 
- NMAP Scans: Scan for vulnerabilities and open ports in both Basic and Aggressive modes. 🔓
+## 🔥 Key Features
 
- Reverse IP Lookup: Discover other domains hosted on the same server. 🔍
+- **WHOIS Lookups**: Get all the domain registration details. 📇  
+- **DNS Resolution**: Retrieve detailed DNS records to understand how a domain is set up. 🌐  
+- **Ping Test**: Check if the domain is live and reachable. 📶  
+- **NMAP Scans**: Scan for open ports and services in both Basic and Aggressive modes. 🔓  
+- **Reverse IP Lookup**: Discover other domains hosted on the same server. 🔍  
+- **Phishing Detection**: Identify if the domain is associated with phishing. ⚠️  
+- **Vulnerability Scanning**: Run **Nikto** scans to detect potential issues. 💥  
 
-Phishing Detection: Quickly identify if the domain is associated with phishing activities. ⚠️
+---
 
-Vulnerability Scanning: Run Nikto scans to find potential vulnerabilities. 💥
-
-Scanning Levels 🚀
+## 🚀 Scanning Levels
 
 Choose your scan level based on your expertise and needs:
 
-    Beginner: Basic scans for quick insights 🌱
+- **Beginner**: Basic scans for quick insights 🌱  
+- **Intermediate**: Full scans with in-depth analysis 🔧  
+- **Advanced**: Aggressive scans for advanced investigations 🔴  
 
-    Intermediate: Full scans with in-depth analysis 🔧
+---
 
-    Advanced: Aggressive scans for serious security investigations 🔴
+## ❓ Why Choose DomainGhost?
 
-Why DomainGhost? 🤔
+- 🎯 **Super Easy to Use**: Simple, interactive interface with clear results  
+- 🤖 **AI-Powered Insights**: Automatically spot suspicious activity  
+- 🔒 **Focused**: Built specifically for domain & DNS scanning  
+- 💻 **Cross-Platform**: Works on both **Linux** and **Windows**
 
-Super Easy to Use: Simple, interactive interface with clear results. 🎯
+---
 
-AI-Powered Insights: Receive suggestions based on the analysis, helping you spot suspicious domains! 🤖
+## 💥 Installation
 
-Tailored for Domain and DNS Scanning: Focused on what matters — domains and DNS backend! 🔒
+Clone the repository and install dependencies:
 
-Cross-Platform Support: Works on both Linux and Windows for maximum flexibility. 💻🖥️
-
-🚨 Are You Ready to Discover Hidden Threats? 🚨
-
-Whether you're analyzing websites for security risks or conducting investigations on suspicious domains, DomainGhost gives you the tools to dive deep and uncover what others miss. 🕵️‍♂️
-Installation 💥
-
-To install DomainGhost, simply clone the repository and install the necessary dependencies:
-
-    git clone https://github.com/yourusername/DomainGhost.git
-    cd DomainGhost
-    pip install -r requirements.txt
-
-Usage ⚡
-
+```bash
+git clone https://github.com/Nikhilkaware36/DomainGhost.git
+cd DomainGhost
+pip install -r requirements.txt
+⚡ Usage
 Run the tool with:
 
-    python domainghost.py
+bash
+Copy
+Edit
+python domainghost.py
+🧾 License
+This project is licensed under the MIT License – see the LICENSE file for details.
 
-License ⚖️
+👤 Author
+Nikhil Santosh Kaware
+GitHub: Nikhilkaware36
 
-This project is licensed under the MIT License - see the LICENSE file for details.
