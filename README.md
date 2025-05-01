@@ -3,6 +3,8 @@ DomainGhost 🔍💀
 DomainGhost is a powerful, easy-to-use domain and DNS backend scanning tool designed to empower security professionals, ethical hackers, and enthusiasts. 🌐🔐 Whether you're just getting started with security research or you're an experienced expert, DomainGhost gives you the tools you need to assess the health, reputation, and security of any domain. 💻🛡️
 Key Features 🔥
 
+Keywords: CTF, cybersecurity, domain scanner, OSINT, red team, reconnaissance, WHOIS, DNS, NMAP
+
 WHOIS Lookups: Get all the domain registration details. 📇
 
  DNS Resolution: Retrieve detailed DNS records to understand how a domain is set up. 🌐
